@@ -76,11 +76,11 @@ namespace Mixture
 			cmd.SetComputeFloatParam(computeShader, "_Distance", distance / 100.0f);
 
 			output.doubleBuffered = true;
-			output.EnsureDoubleBufferConsistency();
-			var rt = output.GetDoubleBufferRenderTexture();
-			rt.Release();
-			rt.enableRandomWrite = true;
-			rt.Create();
+			//output.EnsureDoubleBufferConsistency();
+			// var rt = output.GetDoubleBufferRenderTexture();
+			// rt.Release();
+			// rt.enableRandomWrite = true;
+			// rt.Create();
 
 			// TODO: function for this
 			cmd.DisableShaderKeyword("CRT_2D");
@@ -92,7 +92,7 @@ namespace Mixture
 
 			cmd.SetComputeTextureParam(computeShader, fillUvKernel, "_Input", input);
 			cmd.SetComputeTextureParam(computeShader, fillUvKernel, "_Output", output);
-			cmd.SetComputeTextureParam(computeShader, fillUvKernel, "_FinalOutput", rt);
+			//cmd.SetComputeTextureParam(computeShader, fillUvKernel, "_FinalOutput", rt);
 			DispatchCompute(cmd, fillUvKernel, output.width, output.height, output.volumeDepth);
 
 			int maxLevels = (int)Mathf.Log(input.width, 2);
@@ -101,13 +101,13 @@ namespace Mixture
 				float offset = 1 << (maxLevels - i);
 				cmd.SetComputeFloatParam(computeShader, "_Offset", offset);
 				cmd.SetComputeTextureParam(computeShader, jumpFloodingKernel, "_Input", output);
-				cmd.SetComputeTextureParam(computeShader, jumpFloodingKernel, "_Output", rt);
+				//cmd.SetComputeTextureParam(computeShader, jumpFloodingKernel, "_Output", rt);
 				DispatchCompute(cmd, jumpFloodingKernel, output.width, output.height, output.volumeDepth);
-				cmd.CopyTexture(rt, output);
+				//cmd.CopyTexture(rt, output);
 			}
 
 			cmd.SetComputeTextureParam(computeShader, finalPassKernel, "_Input", input);
-			cmd.SetComputeTextureParam(computeShader, finalPassKernel, "_Output", rt);
+			//cmd.SetComputeTextureParam(computeShader, finalPassKernel, "_Output", rt);
 			cmd.SetComputeTextureParam(computeShader, finalPassKernel, "_FinalOutput", output);
 			DispatchCompute(cmd, finalPassKernel, output.width, output.height, output.volumeDepth);
 

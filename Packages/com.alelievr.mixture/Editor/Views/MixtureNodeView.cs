@@ -1,13 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using UnityEditorInternal;
 using UnityEngine.Rendering;
-using UnityEngine.Experimental.Rendering;
 using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 using GraphProcessor;
 using System.Linq;
+
 
 namespace Mixture
 {
@@ -213,6 +211,14 @@ namespace Mixture
 				else
 					PinView();
 			}, PinStatus);
+			if (nodeTarget is BaseConstantNode)
+			{
+				evt.menu.AppendAction("Convert", e =>
+				{
+					var n = new IntegerNode();
+				});
+			}
+
 
 			base.BuildContextualMenu(evt);
 		}

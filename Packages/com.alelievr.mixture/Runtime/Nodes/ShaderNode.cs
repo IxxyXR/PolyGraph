@@ -31,7 +31,7 @@ namespace Mixture
 			{
 				var sampler = CustomTextureManager.GetCustomTextureProfilingSampler(output);
 				if (sampler != null)
-					return sampler.GetRecorder().gpuElapsedNanoseconds / 1000000.0f;
+					return sampler.GetRecorder().elapsedNanoseconds / 1000000.0f;
 				return 0;
 			}
 		}

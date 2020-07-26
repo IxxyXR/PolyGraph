@@ -27,6 +27,7 @@ namespace Mixture
 
 		protected override bool ProcessNode(CommandBuffer cmd)
 		{
+			Debug.Log($"{a} {b}");
 			o = new Vector4(a.x / b.x, a.y / b.y, a.z / b.z, a.w / b.w);
 			return true;
 		}

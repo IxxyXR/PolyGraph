@@ -12,9 +12,7 @@ namespace Mixture
 		[Output(name = "Integer"),SerializeField]
 		public int Int = 1;
 
-		public override bool 	hasSettings => false;
 		public override string	name => "Integer";
-		public override float	nodeWidth => 200;
 		public override bool showDefaultInspector => true;
 	}
 }

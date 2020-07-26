@@ -31,13 +31,13 @@ public static class CustomTextureManager
     [RuntimeInitializeOnLoadMethod]
     static void SetupManager()
     {
-        CustomRenderTextureManager.textureLoaded -= OnCRTLoaded;
-        CustomRenderTextureManager.textureLoaded += OnCRTLoaded;
-        CustomRenderTextureManager.textureUnloaded -= OnCRTUnloaded;
-        CustomRenderTextureManager.textureUnloaded += OnCRTUnloaded;
-
-        CustomRenderTextureManager.updateTriggered += OnUpdateCalled;
-        CustomRenderTextureManager.initializeTriggered += OnInitializeCalled;
+        // CustomRenderTextureManager.textureLoaded -= OnCRTLoaded;
+        // CustomRenderTextureManager.textureLoaded += OnCRTLoaded;
+        // CustomRenderTextureManager.textureUnloaded -= OnCRTUnloaded;
+        // CustomRenderTextureManager.textureUnloaded += OnCRTUnloaded;
+        //
+        // CustomRenderTextureManager.updateTriggered += OnUpdateCalled;
+        // CustomRenderTextureManager.initializeTriggered += OnInitializeCalled;
 
 #if UNITY_EDITOR
         // In the editor we might not always have a camera to update our custom render textures
@@ -48,14 +48,14 @@ public static class CustomTextureManager
         RenderPipelineManager.beginFrameRendering += UpdateCRTsRuntime;
 #endif
 
-        GraphicsSettings.disableBuiltinCustomRenderTextureUpdate = true;
+        //GraphicsSettings.disableBuiltinCustomRenderTextureUpdate = true;
         UpdateSRPCustomRenderTextureStatus();
     }
 
     static void UpdateCRTsEditor()
     {
-        if (!GraphicsSettings.disableBuiltinCustomRenderTextureUpdate)
-            return;
+        // if (!GraphicsSettings.disableBuiltinCustomRenderTextureUpdate)
+        //     return;
 
         UpdateDependencies();
 
@@ -64,8 +64,8 @@ public static class CustomTextureManager
 
     static void UpdateCRTsRuntime(ScriptableRenderContext context, Camera[] cameras)
     {
-        if (!GraphicsSettings.disableBuiltinCustomRenderTextureUpdate)
-            return;
+        // if (!GraphicsSettings.disableBuiltinCustomRenderTextureUpdate)
+        //     return;
         
         UpdateDependencies();
 
@@ -97,19 +97,19 @@ public static class CustomTextureManager
 
     static void UpdateSRPCustomRenderTextureStatus()
     {
-        if (!GraphicsSettings.disableBuiltinCustomRenderTextureUpdate)
-        {
-            // SRP custom textures have been disabled so we clear our list
-            customRenderTextures.Clear();
-        }
-        else
-        {
-            // Gather the list of all running custom render textures and call the loaded callback
-            CustomRenderTextureManager.GetAllCustomRenderTextures(customRenderTextures);
-            
-            foreach (var crt in customRenderTextures)
-                InitializeCustomRenderTexture(crt);
-        }
+        // if (!GraphicsSettings.disableBuiltinCustomRenderTextureUpdate)
+        // {
+        //     // SRP custom textures have been disabled so we clear our list
+        //     customRenderTextures.Clear();
+        // }
+        // else
+        // {
+        //     // Gather the list of all running custom render textures and call the loaded callback
+        //     CustomRenderTextureManager.GetAllCustomRenderTextures(customRenderTextures);
+        //
+        //     foreach (var crt in customRenderTextures)
+        //         InitializeCustomRenderTexture(crt);
+        // }
     }
 
     // CustomRenderTexture.Update have been called by the user
@@ -272,10 +272,10 @@ public static class CustomTextureManager
             customRenderTextureSamplers.TryGetValue(crt, out var sampler);
             if (sampler == null)
             {
-                sampler = customRenderTextureSamplers[crt] = CustomSampler.Create($"{crt.name} - {crt.GetInstanceID()}", true);
-                sampler.GetRecorder().enabled = true;
+                //sampler = customRenderTextureSamplers[crt] = CustomSampler.Create($"{crt.name} - {crt.GetInstanceID()}", true);
+                //sampler.GetRecorder().enabled = true;
             }
-            cmd.BeginSample(sampler);
+            //cmd.BeginSample(sampler);
 #endif
 
             using (new ProfilingScope(cmd, new ProfilingSampler($"Update {crt.name}")))
@@ -297,7 +297,7 @@ public static class CustomTextureManager
                 if (crt.doubleBuffered)
                 {
                     // Update the internal double buffered render texture (resize / alloc / ect.)
-                    crt.EnsureDoubleBufferConsistency();
+                    //crt.EnsureDoubleBufferConsistency();
                 }
 
                 MaterialPropertyBlock block = new MaterialPropertyBlock();
@@ -309,8 +309,8 @@ public static class CustomTextureManager
                     int sliceCount = GetSliceCount(crt);
                     for (int slice = 0; slice < sliceCount; slice++)
                     {
-                        RenderTexture renderTexture = crt.doubleBuffered ? crt.GetDoubleBufferRenderTexture() : crt;
-                        cmd.SetRenderTarget(renderTexture, 0, (crt.dimension == TextureDimension.Cube) ? (CubemapFace)slice : 0, (crt.dimension == TextureDimension.Tex3D) ? slice : 0);
+                        //RenderTexture renderTexture = crt.doubleBuffered ? crt.GetDoubleBufferRenderTexture() : crt;
+                        //cmd.SetRenderTarget(renderTexture, 0, (crt.dimension == TextureDimension.Cube) ? (CubemapFace)slice : 0, (crt.dimension == TextureDimension.Tex3D) ? slice : 0);
                         cmd.SetViewport(new Rect(0, 0, crt.width, crt.height));
                         block.SetVector(kCustomRenderTextureInfo, GetTextureInfos(crt, slice));
                         block.SetVector(kCustomRenderTextureParameters, GetTextureParameters(crt, slice));
@@ -336,13 +336,13 @@ public static class CustomTextureManager
                         {
                             if (zone.needSwap && !firstUpdate)
                             {
-                                var doubleBuffer = crt.GetDoubleBufferRenderTexture();
-                                if (doubleBuffer != null)
-                                {
-                                    // For now, it's just a copy, once we actually do the swap of pointer, be careful to reset the Active Render Texture
-                                    cmd.Blit(doubleBuffer, crt);
-                                    cmd.SetRenderTarget(doubleBuffer, 0, (crt.dimension == TextureDimension.Cube) ? (CubemapFace)slice : 0, slice);
-                                }
+                                //var doubleBuffer = crt.GetDoubleBufferRenderTexture();
+                                // if (doubleBuffer != null)
+                                // {
+                                //     // For now, it's just a copy, once we actually do the swap of pointer, be careful to reset the Active Render Texture
+                                //     cmd.Blit(doubleBuffer, crt);
+                                //     cmd.SetRenderTarget(doubleBuffer, 0, (crt.dimension == TextureDimension.Cube) ? (CubemapFace)slice : 0, slice);
+                                // }
                             }
 
                             int passIndex = zone.passIndex == -1 ? 0 : zone.passIndex;
@@ -362,7 +362,7 @@ public static class CustomTextureManager
             }
 
 #if CUSTOM_TEXTURE_PROFILING
-            cmd.EndSample(sampler);
+            //cmd.EndSample(sampler);
 #endif
             crt.IncrementUpdateCount();
         }

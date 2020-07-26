@@ -38,7 +38,7 @@ namespace Mixture
             PrefabStage.prefabStageClosing += PrefabClosed;
 
             var stage = PrefabStageUtility.GetCurrentPrefabStage();
-            if (stage != null && stage.assetPath == AssetDatabase.GetAssetPath(sceneNode.prefab))
+            if (stage != null && stage.prefabAssetPath == AssetDatabase.GetAssetPath(sceneNode.prefab))
                 PrefabOpened(stage);
 		}
 
@@ -60,7 +60,7 @@ namespace Mixture
 
         void PrefabOpened(PrefabStage stage)
         {
-            if (stage.assetPath != AssetDatabase.GetAssetPath(sceneNode.prefab))
+            if (stage.prefabAssetPath != AssetDatabase.GetAssetPath(sceneNode.prefab))
                 return;
 
             // Prefabs can only have one root GO (i guess?)
@@ -74,12 +74,12 @@ namespace Mixture
                 Debug.LogError("No camera found in prefab, Please add one and re-open the prefab");
 
             openedPrefabRoot = stage.prefabContentsRoot;
-            openedPrefabPath = stage.assetPath;
+            openedPrefabPath = stage.prefabAssetPath;
         }
 
         void PrefabClosed(PrefabStage stage)
         {
-            if (stage.assetPath != AssetDatabase.GetAssetPath(sceneNode.prefab))
+            if (stage.prefabAssetPath != AssetDatabase.GetAssetPath(sceneNode.prefab))
                 return;
 
             openPrefabButton.text = "Open Prefab";

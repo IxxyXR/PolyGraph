@@ -474,63 +474,63 @@ namespace Mixture
                 NativeArray<Color32> colors32;
                 NativeArray<Color> colors;
 
-                switch ((OutputFormat)outputFormat)
-                {
-                    case OutputFormat.RGBA_Float:
-                        colors = request.GetData<Color>(slice);
-                        SetPixelsColor(colors.ToArray(), data.mipLevel);
-                        break;
-                    case OutputFormat.RGBA_LDR:
-                    case OutputFormat.RGBA_sRGB:
-                        colors32 = request.GetData<Color32>(slice);
-                        SetPixelsColor32(colors32.ToArray(), data.mipLevel);
-                        break;
-                    case OutputFormat.R8_Unsigned:
-                        var r8Colors = request.GetData<byte>(slice);
-                        SetPixelsColor32(r8Colors.Select(r => new Color32(r, 0, 0, 0)).ToArray(), data.mipLevel);
-                        break;
-                    case OutputFormat.R16: // For now we don't support half readback
-                    case OutputFormat.RGBA_Half: // For now we don't support half readback
-                        // var r8Colors = request.GetData<short>(slice);
-                        // SetPixelsColor32(r8Colors.Select(r => new Color32(r, 0, 0, 0)).ToArray());
-                    default:
-                        Debug.LogError("Can't readback an image with format: " + outputFormat);
-                        break;
-                }
+                // switch ((OutputFormat)outputFormat)
+                // {
+                //     case OutputFormat.RGBA_Float:
+                //         colors = request.GetData<Color>(slice);
+                //         SetPixelsColor(colors.ToArray(), data.mipLevel);
+                //         break;
+                //     case OutputFormat.RGBA_LDR:
+                //     case OutputFormat.RGBA_sRGB:
+                //         colors32 = request.GetData<Color32>(slice);
+                //         SetPixelsColor32(colors32.ToArray(), data.mipLevel);
+                //         break;
+                //     case OutputFormat.R8_Unsigned:
+                //         var r8Colors = request.GetData<byte>(slice);
+                //         SetPixelsColor32(r8Colors.Select(r => new Color32(r, 0, 0, 0)).ToArray(), data.mipLevel);
+                //         break;
+                //     case OutputFormat.R16: // For now we don't support half readback
+                //     case OutputFormat.RGBA_Half: // For now we don't support half readback
+                //         // var r8Colors = request.GetData<short>(slice);
+                //         // SetPixelsColor32(r8Colors.Select(r => new Color32(r, 0, 0, 0)).ToArray());
+                //     default:
+                //         Debug.LogError("Can't readback an image with format: " + outputFormat);
+                //         break;
+                // }
             }
 
-            switch (data.targetTexture)
-            {
-                case Texture2D t:
-                    FetchSlice(0, t.SetPixels32, t.SetPixels);
-                    t.Apply(false);
-                    break;
-                case Texture3D t:
-                    List<Color32> colors32List = new List<Color32>();
-                    List<Color> colorsList = new List<Color>();
-                    
-                    int sliceCount = Mathf.Max(data.node.tempRenderTexture.volumeDepth / (1 << data.mipLevel), 1);
-                    for (int i = 0; i < sliceCount; i++)
-                        FetchSlice(i, (c, mip) => colors32List.AddRange(c), (c, mip) => colorsList.AddRange(c));
-
-                    if (colors32List.Count != 0)
-                        t.SetPixels32(colors32List.ToArray(), data.mipLevel);
-                    else
-                        t.SetPixels(colorsList.ToArray(), data.mipLevel);
-
-                    t.Apply(false);
-                    break;
-                case Cubemap t:
-                    for (int i = 0; i < 6; i++)
-                        FetchSlice(i, (c, mip) => t.SetPixels(c.Cast<Color>().ToArray(), (CubemapFace)i, mip), (c, mip) => t.SetPixels(c, (CubemapFace)i, mip));
-
-                    t.Apply(false);
-                    break;
-                default:
-                    Debug.LogError(data.targetTexture + " is not a supported type for saving");
-                    return;
-            }
-
+            // switch (data.targetTexture)
+            // {
+            //     case Texture2D t:
+            //         FetchSlice(0, t.SetPixels32, t.SetPixels);
+            //         t.Apply(false);
+            //         break;
+            //     case Texture3D t:
+            //         List<Color32> colors32List = new List<Color32>();
+            //         List<Color> colorsList = new List<Color>();
+            //
+            //         int sliceCount = Mathf.Max(data.node.tempRenderTexture.volumeDepth / (1 << data.mipLevel), 1);
+            //         for (int i = 0; i < sliceCount; i++)
+            //             FetchSlice(i, (c, mip) => colors32List.AddRange(c), (c, mip) => colorsList.AddRange(c));
+            //
+            //         if (colors32List.Count != 0)
+            //             t.SetPixels32(colors32List.ToArray(), data.mipLevel);
+            //         else
+            //             t.SetPixels(colorsList.ToArray(), data.mipLevel);
+            //
+            //         t.Apply(false);
+            //         break;
+            //     case Cubemap t:
+            //         for (int i = 0; i < 6; i++)
+            //             FetchSlice(i, (c, mip) => t.SetPixels(c.Cast<Color>().ToArray(), (CubemapFace)i, mip), (c, mip) => t.SetPixels(c, (CubemapFace)i, mip));
+            //
+            //         t.Apply(false);
+            //         break;
+            //     default:
+            //         Debug.LogError(data.targetTexture + " is not a supported type for saving");
+            //         return;
+            // }
+            //
         }
 
         /// <summary>

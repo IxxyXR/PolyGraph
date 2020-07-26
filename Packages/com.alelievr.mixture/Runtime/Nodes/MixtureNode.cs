@@ -63,7 +63,8 @@ namespace Mixture
 			{
 				if (_sampler == null)
 				{
-					_sampler = CustomSampler.Create(name, true);
+					// _sampler = CustomSampler.Create(name, true);
+					_sampler = CustomSampler.Create(name);
 					recorder = sampler.GetRecorder();
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
 					recorder.enabled = true;
@@ -81,7 +82,7 @@ namespace Mixture
 			{
 				// By default we display the GPU processing time
 				if (recorder != null)
-					return recorder.gpuElapsedNanoseconds / 1000000.0f;
+					return recorder.elapsedNanoseconds / 1000000.0f;
 				return 0;
 			}
 		}
@@ -206,9 +207,9 @@ namespace Mixture
 				ProcessNode(cmd);
 			else
 			{
-				cmd.BeginSample(sampler);
+				cmd.BeginSample(sampler.name);
 				ProcessNode(cmd);
-				cmd.EndSample(sampler);
+				cmd.EndSample(sampler.name);
 			}
 			afterProcessCleanup?.Invoke();
 		}

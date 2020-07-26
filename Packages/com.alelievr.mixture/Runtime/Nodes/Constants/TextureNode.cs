@@ -12,7 +12,6 @@ namespace Mixture
 		[Output(name = "Texture")]
 		public Texture2D texture;
 
-		public override bool 	hasSettings => false;
 		public override string	name => "Texture2D";
         public override Texture previewTexture => texture;
     }

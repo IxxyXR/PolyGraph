@@ -11,7 +11,6 @@ namespace Mixture
 	{
 		[Input(name = "In")]
 		public Texture			input;
-
 		public bool				hasMips = false;
 
 		public Shader			customMipMapShader;
@@ -68,7 +67,7 @@ namespace Mixture
 		public MixtureCompressionFormat		compressionFormat = MixtureCompressionFormat.DXT5;
 		public MixtureCompressionQuality	compressionQuality = MixtureCompressionQuality.Best;
 		public bool							enableCompression = false;
-		
+
 		// TODO: move this to NodeGraphProcessor
 		[NonSerialized]
 		protected HashSet< string > uniqueMessages = new HashSet< string >();
@@ -123,76 +122,6 @@ namespace Mixture
 
 		protected override bool ProcessNode(CommandBuffer cmd)
 		{
-			if (graph.outputTexture == null)
-			{
-				Debug.LogError("Output Node can't write to target texture, Graph references a null output texture");
-				return false;
-			}
-			
-			// Update the renderTexture reference for realtime graph
-			if (graph.isRealtime)
-			{
-				if (tempRenderTexture != graph.outputTexture)
-					onTempRenderTextureUpdated?.Invoke();
-				tempRenderTexture = graph.outputTexture as CustomRenderTexture;
-			}
-
-			var inputPort = GetPort(nameof(input), nameof(input));
-
-			if (inputPort.GetEdges().Count == 0)
-			{
-				if (uniqueMessages.Add("OutputNotConnected"))
-					AddMessage("Output node input is not connected", NodeMessageType.Warning);
-			}
-			else
-			{
-				uniqueMessages.Clear();
-				ClearMessages();
-			}
-
-			// Update the renderTexture size and format:
-			if (UpdateTempRenderTexture(ref tempRenderTexture, hasMips, customMipMapShader == null))
-				onTempRenderTextureUpdated?.Invoke();
-
-			// Manually reset all texture inputs
-			ResetMaterialPropertyToDefault(finalCopyMaterial, "_Source_2D");
-			ResetMaterialPropertyToDefault(finalCopyMaterial, "_Source_3D");
-			ResetMaterialPropertyToDefault(finalCopyMaterial, "_Source_Cube");
-
-			if (input != null && inputPort.GetEdges().Count != 0)
-			{
-				if (input.dimension != (TextureDimension)rtSettings.dimension)
-				{
-					Debug.LogError("Error: Expected texture type input for the OutputNode is " + graph.outputTexture.dimension + " but " + input?.dimension + " was provided");
-					return false;
-				}
-
-				MixtureUtils.SetupDimensionKeyword(finalCopyMaterial, input.dimension);
-
-				if (input.dimension == TextureDimension.Tex2D)
-				{
-					finalCopyMaterial.SetTexture("_Source_2D", input);
-				}
-				else if (input.dimension == TextureDimension.Tex3D)
-					finalCopyMaterial.SetTexture("_Source_3D", input);
-				else
-					finalCopyMaterial.SetTexture("_Source_Cube", input);
-			}
-
-			tempRenderTexture.material = finalCopyMaterial;
-
-			// The CustomRenderTexture update will be triggered at the begining of the next frame so we wait one frame to generate the mipmaps
-			// We need to do this because we can't generate custom mipMaps with CustomRenderTextures
-			if (customMipMapShader != null && hasMips)
-			{
-				UpdateTempRenderTexture(ref mipmapRenderTexture, true, false);
-				GenerateCustomMipMaps();
-			}
-			else
-			{
-				Camera.main.RemoveCommandBuffers(CameraEvent.BeforeDepthTexture);
-			}
-
 			return true;
 		}
 
@@ -210,7 +139,7 @@ namespace Mixture
 
 			if (mipMapPropertyBlock == null)
 				mipMapPropertyBlock = new MaterialPropertyBlock();
-			
+
 			int slice = 0;
 			// TODO: support 3D textures and Cubemaps
 			// for (int slice = 0; slice < tempRenderTexture.volumeDepth; slice++)
@@ -251,13 +180,7 @@ namespace Mixture
 
 		void BeginFrameRendering(ScriptableRenderContext renderContext, Camera[] cameras)
 		{
-#if UNITY_EDITOR
-			if (hasMips)
-			{
-				renderContext.ExecuteCommandBuffer(mipchainCmd);
-				renderContext.Submit();
-			}
-#endif
+
 		}
 
 		[CustomPortBehavior(nameof(input))]
