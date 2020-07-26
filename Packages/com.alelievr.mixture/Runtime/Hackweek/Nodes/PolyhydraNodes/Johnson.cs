@@ -2,6 +2,7 @@ using System;
 using Conway;
 using UnityEngine;
 using GraphProcessor;
+using Johnson;
 using UnityEngine.Rendering;
 
 
@@ -29,66 +30,67 @@ namespace Mixture
 		protected override bool ProcessNode(CommandBuffer cmd)
 		{
 
-			sideAngle = sides == 0 ? 0 : 360f / sides;
+			sides = sides < 3 ? 3 : sides;
+			sideAngle = 360f / sides;
 
 			poly = new ConwayPoly();
 
 			switch (johnsonPolyType)
 			{
 				case PolyHydraEnums.JohnsonPolyTypes.Prism:
-					poly = JohnsonPoly.Prism(sides<3?3:sides);
+					poly = JohnsonPoly.Prism(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.Antiprism:
-					poly = JohnsonPoly.Antiprism(sides<3?3:sides);
+					poly = JohnsonPoly.Antiprism(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.Pyramid:
-					poly = JohnsonPoly.Pyramid(sides<3?3:sides);
+					poly = JohnsonPoly.Pyramid(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.ElongatedPyramid:
-					poly = JohnsonPoly.ElongatedPyramid(sides<3?3:sides);
+					poly = JohnsonPoly.ElongatedPyramid(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.GyroelongatedPyramid:
-					poly = JohnsonPoly.GyroelongatedPyramid(sides<3?3:sides);
+					poly = JohnsonPoly.GyroelongatedPyramid(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.Dipyramid:
-					poly = JohnsonPoly.Dipyramid(sides<3?3:sides);
+					poly = JohnsonPoly.Dipyramid(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.ElongatedDipyramid:
-					poly = JohnsonPoly.ElongatedBipyramid(sides<3?3:sides);
+					poly = JohnsonPoly.ElongatedBipyramid(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.GyroelongatedDipyramid:
-					poly = JohnsonPoly.GyroelongatedBipyramid(sides<3?3:sides);
+					poly = JohnsonPoly.GyroelongatedBipyramid(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.Cupola:
-					poly = JohnsonPoly.Cupola(sides<3?3:sides);
+					poly = JohnsonPoly.Cupola(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.ElongatedCupola:
-					poly = JohnsonPoly.ElongatedCupola(sides<3?3:sides);
+					poly = JohnsonPoly.ElongatedCupola(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.GyroelongatedCupola:
-					poly = JohnsonPoly.GyroelongatedCupola(sides<3?3:sides);
+					poly = JohnsonPoly.GyroelongatedCupola(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.OrthoBicupola:
-					poly = JohnsonPoly.OrthoBicupola(sides<3?3:sides);
+					poly = JohnsonPoly.OrthoBicupola(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.GyroBicupola:
-					poly = JohnsonPoly.GyroBicupola(sides<3?3:sides);
+					poly = JohnsonPoly.GyroBicupola(sides);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.ElongatedOrthoBicupola:
-					poly = JohnsonPoly.ElongatedBicupola(sides<3?3:sides, false);
+					poly = JohnsonPoly.ElongatedBicupola(sides, false);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.ElongatedGyroBicupola:
-					poly = JohnsonPoly.ElongatedBicupola(sides<3?3:sides, true);
+					poly = JohnsonPoly.ElongatedBicupola(sides, true);
 					break;
 				case PolyHydraEnums.JohnsonPolyTypes.GyroelongatedBicupola:
-					poly = JohnsonPoly.GyroelongatedBicupola(sides<3?3:sides, false);
+					poly = JohnsonPoly.GyroelongatedBicupola(sides, false);
 					break;
 				// The distinction between these two is simply one of chirality
 				// case PolyHydraEnums.JohnsonPolyTypes.GyroelongatedOrthoBicupola:
-				// 	poly = JohnsonPoly.GyroElongatedBicupola(sides<3?3:sides, false);
+				// 	poly = JohnsonPoly.GyroElongatedBicupola(sides, false);
 				// 	break;
 				// case PolyHydraEnums.JohnsonPolyTypes.GyroelongatedGyroBicupola:
-				// 	poly = JohnsonPoly.GyroElongatedBicupola(sides<3?3:sides, true);
+				// 	poly = JohnsonPoly.GyroElongatedBicupola(sides, true);
 				// 	break;
 				case PolyHydraEnums.JohnsonPolyTypes.Rotunda:
 					poly = JohnsonPoly.Rotunda();

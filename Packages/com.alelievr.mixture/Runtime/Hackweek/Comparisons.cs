@@ -27,4 +27,12 @@ namespace Mixture
                 {Conditions.GreaterOrEqual, t => t.Item1 >= t.Item2},
             };
     }
+
+    public enum TargetTypes
+    {
+        Vertices,
+        Faces,
+        Edges,
+    }
+
 }

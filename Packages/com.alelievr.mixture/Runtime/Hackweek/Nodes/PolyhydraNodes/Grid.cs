@@ -9,10 +9,14 @@ namespace Mixture
     [System.Serializable, NodeMenuItem("Grid")]
     public class GridNode : MixtureNode
     {
-        [Output("Mesh")]
-        public MixtureMesh meshOutput;
         [Output("Polyhedra")]
-        public ConwayPoly conwayOutput;
+        public ConwayPoly poly;
+
+        [SerializeField]
+        public PolyHydraEnums.GridTypes GridType;
+
+        [SerializeField]
+        public PolyHydraEnums.GridShapes GridShape;
 
         public override string	name => "Grid";
         public override bool hasSettings => false;
@@ -30,13 +34,19 @@ namespace Mixture
 
         protected override bool ProcessNode(CommandBuffer cmd)
         {
-            var conway = ConwayPoly.MakeGrid(Rows, Columns, RowScale, ColumnScale);
 
-            var mesh = PolyMeshBuilder.BuildMeshFromConwayPoly(conway, false);
-
-            meshOutput = new MixtureMesh {mesh = mesh, localToWorld = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one)};
-            conwayOutput = conway;
-
+            switch (GridType)
+            {
+                case PolyHydraEnums.GridTypes.Square:
+                    poly = Grids.Grids.MakeGrid(Rows, Columns, RowScale, ColumnScale);
+                    break;
+                case PolyHydraEnums.GridTypes.Isometric:
+                    poly = Grids.Grids.MakeUnitileGrid(Rows, Columns);
+                    break;
+                default:
+                    poly = Grids.Grids.MakeUnitileGrid(Rows, Columns);
+                    break;
+            }
             return true;
 
         }

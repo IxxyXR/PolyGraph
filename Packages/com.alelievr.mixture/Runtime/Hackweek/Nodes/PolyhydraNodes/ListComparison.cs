@@ -19,6 +19,7 @@ namespace Mixture
         [Output]
         public List<bool> output;
 
+        [SerializeField]
         public Conditions condition;
 
         public override string	name => "List Comparison";
