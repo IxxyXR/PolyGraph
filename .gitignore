@@ -40,3 +40,4 @@ sysinfo.txt
 .vscode/
 .DS_STORE
 *.*~
+.idea
