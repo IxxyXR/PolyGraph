@@ -1,0 +1,28 @@
+{
+    "name": "Ixxy.Polygraph.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Unity.ShaderGraph.Editor",
+        "Mixture.Runtime",
+        "com.alelievr.NodeGraphProcessor.Runtime",
+        "com.alelievr.NodeGraphProcessor.Editor",
+        "Unity.ShaderGraph.GraphicsTests",
+        "Ixxy.Conway.Runtime",
+        "Ixxy.Grids.Runtime",
+        "Ixxy.Johnson.Runtime",
+        "Ixxy.Polygraph.Runtime",
+        "Ixxy.Polyhydra.Runtime",
+        "Ixxy.Wythoff.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

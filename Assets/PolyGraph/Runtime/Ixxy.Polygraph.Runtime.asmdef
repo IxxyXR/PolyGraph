@@ -1,0 +1,22 @@
+{
+    "name": "Ixxy.Polygraph.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:fe40ba3f519cd4795b386f0ccc63a5a7",
+        "GUID:00a4cb4d06515dd41ac32e72da5d81b7",
+        "GUID:a48417eabcbbb45399a6a8a8bb558d31",
+        "GUID:04849aac9046c5f4694f4976eddb46c7",
+        "GUID:5ac01eb17a822e042888ae70669b13ab",
+        "GUID:d60e483dbdfd1ef4e91c34837bd71a7e",
+        "GUID:ca937d03ee5dd4d699091438dc0f3ae6"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
