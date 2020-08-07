@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Conway;
 using UnityEngine;
 using GraphProcessor;
@@ -18,16 +20,23 @@ namespace Mixture
 
 		
 		public PolyHydraEnums.Ops op = PolyHydraEnums.Ops.Identity;
-		[Input("Amount"), SerializeField]
-		public float amount = .25f;
-		[Input("Amount"), SerializeField, VisibleIf(nameof(op), PolyHydraEnums.Ops.Identity)]
-		public float amount2 = .25f;
+		[SerializeField] public float amount = .25f;
+		[SerializeField] public float amount2 = .25f;
+
+		// [Input("Amount")]
+		// public Func<FilterParams, float> amountFunc;
+		// [Input("Amount2")]
+		// public Func<FilterParams, float> amount2Func;
+
+		[Input("Amount")]
+		public List<float> amountList;
+		[Input("Amount2")]
+		public List<float> amount2List;
+
 		public FaceSelections faceSelections = FaceSelections.All;
 		public bool disabled;
 		public bool randomize;
 		public string tags;
-
-
 
 		[Output("Polyhedra")]
 		public ConwayPoly conwayOutput;
@@ -41,14 +50,31 @@ namespace Mixture
 		
 		protected override bool ProcessNode(CommandBuffer cmd)
 		{
+
 			if (!disabled)
 			{
+				Func<FilterParams, float> amountFunc;
+				if (amountList == null || amountList.Count==0)
+				{
+					amountFunc = x => amount;
+				} else {
+					amountFunc = x => amountList[x.index];
+				}
+
+				Func<FilterParams, float> amount2Func;
+				if (amount2List == null || amount2List.Count==0)
+				{
+					amount2Func = x => amount2;
+				} else {
+					amount2Func = x => amount2List[x.index];
+				}
+
 				switch (op)
 				{
 					case PolyHydraEnums.Ops.Identity:
 						break;
 					case PolyHydraEnums.Ops.Kis:
-						conway = conway.Kis(amount, faceSelections, tags, randomize);
+						conway = conway.Kis(amount, faceSelections, tags, randomize, null, false, amountFunc);
 						break;
 					case PolyHydraEnums.Ops.Dual:
 						conway = conway.Dual();
@@ -105,7 +131,7 @@ namespace Mixture
 						conway = conway.Subdivide(amount);
 						break;
 					case PolyHydraEnums.Ops.Loft:
-						conway = conway.Loft(amount, amount2, faceSelections, tags, randomize);
+						conway = conway.Loft(amount, amount2, faceSelections, tags, randomize, amountFunc, amount2Func);
 						break;
 					case PolyHydraEnums.Ops.Chamfer:
 						conway = conway.Chamfer(amount);
@@ -120,13 +146,13 @@ namespace Mixture
 						conway = conway.OppositeLace(amount, amount2, randomize);
 						break;
 					case PolyHydraEnums.Ops.Lace:
-						conway = conway.Lace(amount, faceSelections, tags, amount2, randomize);
+						conway = conway.Lace(amount, faceSelections, tags, amount2, randomize, amountFunc, amount2Func);
 						break;
 					case PolyHydraEnums.Ops.JoinKisKis:
 						conway = conway.JoinKisKis(amount, amount2);
 						break;
 					case PolyHydraEnums.Ops.Stake:
-						conway = conway.Stake(amount, faceSelections, tags);
+						conway = conway.Stake(amount, faceSelections, tags, false, amountFunc);
 						break;
 					case PolyHydraEnums.Ops.JoinStake:
 						conway = conway.Stake(amount, faceSelections, tags, true);

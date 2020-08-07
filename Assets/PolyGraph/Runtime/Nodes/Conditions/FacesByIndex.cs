@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using Conway;
 using UnityEngine;
 using GraphProcessor;
@@ -9,15 +7,15 @@ using UnityEngine.Rendering;
 
 namespace Mixture
 {
-    [Serializable, NodeMenuItem("Polyhydra/Filter/Faces by # Sides")]
-    public class FacesByNumberOfSidesNode : MixtureNode
+    [Serializable, NodeMenuItem("Polyhydra/Filter/Faces by Index")]
+    public class FacesByIndex : MixtureNode
     {
 
-        public override string	name => "Faces by # Sides";
+        public override string	name => "Filter Faces by Index";
         public override bool hasSettings => false;
 
-        [Input("Sides"), SerializeField]
-        public int sides;
+        [Input("Index"), SerializeField]
+        public int index;
 
         public IntConditions condition;
 
@@ -30,7 +28,7 @@ namespace Mixture
         protected override bool ProcessNode(CommandBuffer cmd)
         {
             var comparison = IntComparisonsHelper.Comparisons[condition];
-            filter = p => comparison((p.poly.Faces[p.index].Sides, sides));
+            filter = p => comparison((p.index, index));
             return true;
         }
     }

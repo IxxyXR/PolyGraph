@@ -9,17 +9,17 @@ using UnityEngine.Rendering;
 
 namespace Mixture
 {
-    [Serializable, NodeMenuItem("Polyhydra/Filter/Faces by # Sides")]
-    public class FacesByNumberOfSidesNode : MixtureNode
+    [Serializable, NodeMenuItem("Polyhydra/Filter/Faces by Area")]
+    public class FacesByArea : MixtureNode
     {
 
-        public override string	name => "Faces by # Sides";
+        public override string	name => "Filter Faces by Area";
         public override bool hasSettings => false;
 
-        [Input("Sides"), SerializeField]
-        public int sides;
+        [Input("Area"), SerializeField]
+        public float area;
 
-        public IntConditions condition;
+        public FloatConditions condition;
 
         [Output("Face Filter")]
         public Func<FilterParams, bool> filter;
@@ -29,8 +29,8 @@ namespace Mixture
 
         protected override bool ProcessNode(CommandBuffer cmd)
         {
-            var comparison = IntComparisonsHelper.Comparisons[condition];
-            filter = p => comparison((p.poly.Faces[p.index].Sides, sides));
+            var comparison = FloatComparisonsHelper.Comparisons[condition];
+            filter = p => comparison((p.poly.Faces[p.index].GetArea(), area));
             return true;
         }
     }

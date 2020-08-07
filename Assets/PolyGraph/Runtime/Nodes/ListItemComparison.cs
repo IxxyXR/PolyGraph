@@ -8,8 +8,8 @@ using System;
 namespace Mixture
 {
 
-    [System.Serializable, NodeMenuItem("Polyhydra/List Comparison")]
-    public class ListComparisonNode : MixtureNode
+    [System.Serializable, NodeMenuItem("Polyhydra/List Item Comparison")]
+    public class ListItemComparisonNode : MixtureNode
     {
         [Input]
         public List<float> a;
@@ -20,15 +20,15 @@ namespace Mixture
         public List<bool> output;
 
         [SerializeField]
-        public Conditions condition;
+        public FloatConditions condition;
 
-        public override string	name => "List Comparison";
+        public override string	name => "List Item Comparison";
         public override bool    hasPreview => false;
         public override bool	showDefaultInspector => true;
 
         protected override bool ProcessNode(CommandBuffer cmd)
         {
-            var comparator = ComparisonsHelper.Comparisons[condition];
+            var comparator = FloatComparisonsHelper.Comparisons[condition];
             output.Clear();
             for (var i = 0; i < Mathf.Max(a.Count, b.Count); i++)
             {

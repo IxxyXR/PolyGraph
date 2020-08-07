@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Conway;
@@ -17,8 +18,8 @@ namespace Mixture
 
         [Input("Source Polyhydra")]
         public ConwayPoly sourcePoly;
-        [Input("Face List")]
-        public List<int> FaceList;
+        [Input("Face Filter")]
+        public Func<FilterParams, bool> FaceFilter;
 
         [Output("Result")]
         public ConwayPoly result;
@@ -28,7 +29,7 @@ namespace Mixture
 
         protected override bool ProcessNode(CommandBuffer cmd)
         {
-            result = sourcePoly.FaceRemove(false, FaceList);
+            result = sourcePoly.FaceRemove(false, FaceFilter);
             return true;
 
         }

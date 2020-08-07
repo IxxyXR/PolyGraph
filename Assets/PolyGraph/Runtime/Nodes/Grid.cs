@@ -40,11 +40,8 @@ namespace Mixture
                 case PolyHydraEnums.GridTypes.Square:
                     poly = Grids.Grids.MakeGrid(Rows, Columns, RowScale, ColumnScale);
                     break;
-                case PolyHydraEnums.GridTypes.Isometric:
-                    poly = Grids.Grids.MakeUnitileGrid(Rows, Columns);
-                    break;
                 default:
-                    poly = Grids.Grids.MakeUnitileGrid(Rows, Columns);
+                    poly = Grids.Grids.MakeUnitileGrid((int)GridType, (int)GridShape, Rows, Columns);
                     break;
             }
             return true;

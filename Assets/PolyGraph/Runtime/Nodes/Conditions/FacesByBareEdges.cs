@@ -9,15 +9,15 @@ using UnityEngine.Rendering;
 
 namespace Mixture
 {
-    [Serializable, NodeMenuItem("Polyhydra/Filter/Faces by # Sides")]
-    public class FacesByNumberOfSidesNode : MixtureNode
+    [Serializable, NodeMenuItem("Polyhydra/Filter/Faces by Bare Edges")]
+    public class FacesByBareEdges : MixtureNode
     {
 
-        public override string	name => "Faces by # Sides";
+        public override string	name => "Filter Faces by Bare Edges";
         public override bool hasSettings => false;
 
-        [Input("Sides"), SerializeField]
-        public int sides;
+        [Input("Bare Edges"), SerializeField]
+        public int BareEdges;
 
         public IntConditions condition;
 
@@ -30,7 +30,7 @@ namespace Mixture
         protected override bool ProcessNode(CommandBuffer cmd)
         {
             var comparison = IntComparisonsHelper.Comparisons[condition];
-            filter = p => comparison((p.poly.Faces[p.index].Sides, sides));
+            filter = p => comparison((p.poly.Faces[p.index].NakedEdges().Count(), BareEdges));
             return true;
         }
     }

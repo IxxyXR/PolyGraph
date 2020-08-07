@@ -49,6 +49,7 @@ namespace Mixture
         public static List<Vector3> ConvertBoolToVectorList(bool from) => new List<Vector3> {from?Vector3.one:Vector3.zero};
 
         public static List<float> ConvertIntListToFloatList(List<int> from) => from.Select(x=>(float)x).ToList();
+        public static List<float> ConvertVector3ListToFloatList(List<Vector3> from) => from.Select(x=>x.x).ToList();
         public static List<float> ConvertVector3ToFloatList(Vector3 from) => new List<float> {from.x};
         public static List<float> ConvertFloatToFloatList(float from) => new List<float> {from};
         public static List<float> ConvertIntToFloatList(int from) => new List<float> {from};

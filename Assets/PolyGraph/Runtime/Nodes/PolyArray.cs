@@ -32,23 +32,8 @@ namespace Mixture
 
         protected override bool ProcessNode(CommandBuffer cmd)
         {
-            if (DirectionList.Count < PositionList.Count) DirectionList.AddRange(Enumerable.Repeat(Vector3.zero, PositionList.Count - DirectionList.Count));
-
-            if (ScaleList.Count < PositionList.Count)
-            {
-                // TODO Out of bounds behaviour should be definable - loop, hold, 1, 0
-
-                // Constant 1
-                //ScaleList.AddRange(Enumerable.Repeat(Vector3.one, PositionList.Count - ScaleList.Count));
-
-                // Loop
-                while (ScaleList.Count < PositionList.Count)
-                {
-                    ScaleList.AddRange(ScaleList);
-                }
-                ScaleList.Take(PositionList.Count);
-
-            }
+            ListUtils.PadConstant(DirectionList, PositionList, Vector3.zero);
+            ListUtils.PadConstant(ScaleList, PositionList, Vector3.one);
             result = sourcePoly.PolyArray(PositionList, DirectionList, ScaleList);
             return true;
 
