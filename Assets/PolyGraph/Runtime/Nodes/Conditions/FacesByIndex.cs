@@ -7,7 +7,7 @@ using UnityEngine.Rendering;
 
 namespace Mixture
 {
-    [Serializable, NodeMenuItem("Polyhydra/Filter/Faces by Index")]
+    [Serializable, NodeMenuItem("Polyhydra/Filter/Filter Faces by Index")]
     public class FacesByIndex : MixtureNode
     {
 

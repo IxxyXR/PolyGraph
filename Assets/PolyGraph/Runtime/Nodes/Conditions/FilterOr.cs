@@ -10,7 +10,7 @@ namespace Mixture
     public class FilterOr : MixtureNode
     {
 
-        public override string	name => "Or";
+        public override string	name => "Filter Or";
         public override bool hasSettings => false;
 
         [Input("Filter A")]

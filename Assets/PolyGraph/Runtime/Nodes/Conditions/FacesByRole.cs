@@ -9,7 +9,7 @@ using UnityEngine.Rendering;
 
 namespace Mixture
 {
-    [Serializable, NodeMenuItem("Polyhydra/Filter/Faces by Role")]
+    [Serializable, NodeMenuItem("Polyhydra/Filter/Filter Faces by Role")]
     public class FacesByRole : MixtureNode
     {
 

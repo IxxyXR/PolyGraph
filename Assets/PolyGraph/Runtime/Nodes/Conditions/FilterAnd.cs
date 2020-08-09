@@ -13,7 +13,7 @@ namespace Mixture
     public class FilterAnd : MixtureNode
     {
 
-        public override string	name => "And";
+        public override string	name => "Filter And";
         public override bool hasSettings => false;
 
         [Input("Filter A")]

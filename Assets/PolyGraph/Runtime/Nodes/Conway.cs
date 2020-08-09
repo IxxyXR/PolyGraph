@@ -16,12 +16,12 @@ namespace Mixture
 		public override bool hasSettings => false;
 
 		[Input("Polyhydra")]
-		public ConwayPoly conway;
+		public ConwayPoly poly;
 
 		
 		public PolyHydraEnums.Ops op = PolyHydraEnums.Ops.Identity;
-		[SerializeField] public float amount = .25f;
-		[SerializeField] public float amount2 = .25f;
+		[SerializeField] public float amountVal = .25f;
+		[SerializeField] public float amount2Val = .25f;
 
 		// [Input("Amount")]
 		// public Func<FilterParams, float> amountFunc;
@@ -33,13 +33,16 @@ namespace Mixture
 		[Input("Amount2")]
 		public List<float> amount2List;
 
-		public FaceSelections faceSelections = FaceSelections.All;
+		[Input("Face Filter")]
+		public Func<FilterParams, bool> faceFilter;
+
+		// public FaceSelections faceSelections = FaceSelections.All;
 		public bool disabled;
 		public bool randomize;
 		public string tags;
 
-		[Output("Polyhedra")]
-		public ConwayPoly conwayOutput;
+		[Output("Polyhedra Result")]
+		public ConwayPoly polyResult;
 
 		public override bool hasPreview => false;
 		public override bool showDefaultInspector => true;
@@ -51,291 +54,286 @@ namespace Mixture
 		protected override bool ProcessNode(CommandBuffer cmd)
 		{
 
+			if (poly == null) return false;
+
 			if (!disabled)
 			{
-				Func<FilterParams, float> amountFunc;
-				if (amountList == null || amountList.Count==0)
-				{
-					amountFunc = x => amount;
-				} else {
-					amountFunc = x => amountList[x.index];
-				}
-
-				Func<FilterParams, float> amount2Func;
-				if (amount2List == null || amount2List.Count==0)
-				{
-					amount2Func = x => amount2;
-				} else {
-					amount2Func = x => amount2List[x.index];
-				}
+				// Construct lambdas from lists or constants
+				var amountFunc = amountList == null || amountList.Count == 0
+					? (Func<FilterParams, float>) (x => amountVal)
+					: x => amountList[x.index];
+				var amount2Func = amount2List == null || amount2List.Count == 0
+					? (Func<FilterParams, float>) (x => amount2Val)
+					: x => amount2List[x.index];
 
 				switch (op)
 				{
 					case PolyHydraEnums.Ops.Identity:
 						break;
 					case PolyHydraEnums.Ops.Kis:
-						conway = conway.Kis(amount, faceSelections, tags, randomize, null, false, amountFunc);
+						poly = poly.Kis(new OpParams{funcA = amountFunc, tags=tags, randomize = randomize, filterFunc=faceFilter});
 						break;
 					case PolyHydraEnums.Ops.Dual:
-						conway = conway.Dual();
+						poly = poly.Dual();
 						break;
 					case PolyHydraEnums.Ops.Ambo:
-						conway = conway.Ambo();
+						poly = poly.Ambo();
 						break;
 					case PolyHydraEnums.Ops.Zip:
-						conway = conway.Zip(amount);
+						poly = poly.Zip(new OpParams{funcA = amountFunc});
 						break;
 					case PolyHydraEnums.Ops.Expand:
-						conway = conway.Expand(amount);
+						poly = poly.Expand(new OpParams{funcA = amountFunc});
 						break;
 					case PolyHydraEnums.Ops.Bevel:
-						conway = conway.Bevel(amount, amount2);
+						poly = poly.Bevel(new OpParams{funcA = amountFunc, funcB = amount2Func});
 						break;
 					case PolyHydraEnums.Ops.Join:
-						conway = conway.Join(amount);
+						poly = poly.Join(new OpParams{funcA = amountFunc});
 						break;
 					case PolyHydraEnums.Ops.Needle:
-						conway = conway.Needle(amount, randomize);
+						poly = poly.Needle(new OpParams{randomize = randomize, funcA = amountFunc});
 						break;
 					case PolyHydraEnums.Ops.Ortho:
-						conway = conway.Ortho(amount, randomize);
+						poly = poly.Ortho(new OpParams{randomize = randomize, funcA = amountFunc});
 						break;
 					case PolyHydraEnums.Ops.Meta:
-						conway = conway.Meta(amount, amount2, randomize);
+						poly = poly.Meta(new OpParams{randomize = randomize, funcA = amountFunc, funcB = amount2Func});
 						break;
 					case PolyHydraEnums.Ops.Truncate:
-						conway = conway.Truncate(amount, faceSelections, randomize);
+						poly = poly.Truncate(new OpParams{randomize = randomize, funcA = amountFunc, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.Gyro:
-						conway = conway.Gyro(amount, amount2);
+						poly = poly.Gyro(new OpParams{funcA = amountFunc, funcB = amount2Func});
 						break;
 					case PolyHydraEnums.Ops.Snub:
-						conway = conway.Gyro(amount);
-						conway = conway.Dual();
+						poly = poly.Gyro(new OpParams{funcA = amountFunc});
+						poly = poly.Dual();
 						break;
 					case PolyHydraEnums.Ops.Exalt:
 						// TODO return a correct VertexRole array
 						// I suspect the last vertices map to the original shape verts
-						conway = conway.Dual();
-						conway = conway.Kis(amount, faceSelections, tags, randomize);
-						conway = conway.Dual();
-						conway = conway.Kis(amount, faceSelections, tags, randomize);
+						poly = poly.Dual();
+						poly = poly.Kis(new OpParams{tags = tags, randomize = randomize, funcA = amountFunc, filterFunc = faceFilter});
+						poly = poly.Dual();
+						poly = poly.Kis(new OpParams{tags = tags, randomize = randomize, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.Yank:
-						conway = conway.Kis(amount, faceSelections, tags, randomize);
-						conway = conway.Dual();
-						conway = conway.Kis(amount, faceSelections, tags, randomize);
-						conway = conway.Dual();
+						poly = poly.Kis(new OpParams{tags = tags, randomize = randomize, funcA = amountFunc, filterFunc = faceFilter});
+						poly = poly.Dual();
+						poly = poly.Kis(new OpParams{tags = tags, randomize = randomize, funcA = amountFunc, filterFunc = faceFilter});
+						poly = poly.Dual();
 						break;
 					case PolyHydraEnums.Ops.Subdivide:
-						conway = conway.Subdivide(amount);
+						poly = poly.Subdivide(new OpParams{funcA = amountFunc});
 						break;
 					case PolyHydraEnums.Ops.Loft:
-						conway = conway.Loft(amount, amount2, faceSelections, tags, randomize, amountFunc, amount2Func);
+						poly = poly.Loft(new OpParams{tags=tags, randomize = randomize, funcA = amountFunc, funcB = amount2Func, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.Chamfer:
-						conway = conway.Chamfer(amount);
+						poly = poly.Chamfer(new OpParams{funcA = amountFunc});
 						break;
 					case PolyHydraEnums.Ops.Quinto:
-						conway = conway.Quinto(amount, amount2, randomize);
+						poly = poly.Quinto(new OpParams{funcA = amountFunc, funcB = amount2Func, randomize = randomize});
 						break;
 					case PolyHydraEnums.Ops.JoinedLace:
-						conway = conway.JoinedLace(amount, amount2, randomize);
+						poly = poly.JoinedLace(new OpParams{randomize = randomize, funcA = amountFunc, funcB = amount2Func});
 						break;
 					case PolyHydraEnums.Ops.OppositeLace:
-						conway = conway.OppositeLace(amount, amount2, randomize);
+						poly = poly.OppositeLace(new OpParams{funcA = amountFunc, funcB = amount2Func, randomize = randomize});
 						break;
 					case PolyHydraEnums.Ops.Lace:
-						conway = conway.Lace(amount, faceSelections, tags, amount2, randomize, amountFunc, amount2Func);
+						poly = poly.Lace(new OpParams{tags = tags, randomize = randomize, funcA = amountFunc, funcB = amount2Func, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.JoinKisKis:
-						conway = conway.JoinKisKis(amount, amount2);
+						poly = poly.JoinKisKis(new OpParams{funcA = amountFunc, funcB = amount2Func});
 						break;
 					case PolyHydraEnums.Ops.Stake:
-						conway = conway.Stake(amount, faceSelections, tags, false, amountFunc);
+						poly = poly.Stake(new OpParams{tags = tags, funcA = amountFunc, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.JoinStake:
-						conway = conway.Stake(amount, faceSelections, tags, true);
+						poly = poly.Stake(new OpParams{tags = tags, funcA = amountFunc}, true);
 						break;
 					case PolyHydraEnums.Ops.Medial:
-						conway = conway.Medial((int)amount, amount2);
+						poly = poly.Medial((int)amountVal, amount2Val);
 						break;
 					case PolyHydraEnums.Ops.EdgeMedial:
-						conway = conway.EdgeMedial((int)amount, amount2);
+						poly = poly.EdgeMedial((int)amountVal, amount2Val);
 						break;
 					// case Ops.JoinedMedial:
-					// 	conway = conway.JoinedMedial((int)amount, amount2);
+					// 	conway = conway.JoinedMedial((int)0, amount2);
 					// 	break;
 					case PolyHydraEnums.Ops.Propeller:
-						conway = conway.Propeller(amount);
+						poly = poly.Propeller(amountVal);
 						break;
 					case PolyHydraEnums.Ops.Whirl:
-						conway = conway.Whirl(amount);
+						poly = poly.Whirl(amountVal);
 						break;
 					case PolyHydraEnums.Ops.Volute:
-						conway = conway.Volute(amount);
+						poly = poly.Volute(amountVal);
 						break;
 					case PolyHydraEnums.Ops.Cross:
-						conway = conway.Cross(amount);
+						poly = poly.Cross(new OpParams{funcA = amountFunc});
 						break;
 					case PolyHydraEnums.Ops.Squall:
-						conway = conway.Squall(amount, false);
+						poly = poly.Squall(new OpParams{funcA = amountFunc}, false);
 						break;
 					case PolyHydraEnums.Ops.JoinSquall:
-						conway = conway.Squall(amount, true);
+						poly = poly.Squall(new OpParams{funcA = amountFunc}, true);
 						break;
 					case PolyHydraEnums.Ops.Shell:
 						// TODO do this properly with shared edges/vertices
-						conway = conway.Extrude(amount, false, randomize);
+						poly = poly.Shell(amountVal, false, randomize);
 						break;
 					case PolyHydraEnums.Ops.Skeleton:
-						conway = conway.FaceRemove(faceSelections, tags);
-						if ((faceSelections==FaceSelections.New || faceSelections==FaceSelections.NewAlt) && op == PolyHydraEnums.Ops.Skeleton)
-						{
-							// Nasty hack until I fix extrude
-							// Produces better results specific for PolyMidi
-							conway = conway.FaceScale(0f, FaceSelections.All);
-						}
-						conway = conway.Extrude(amount, false, randomize);
+						// poly = poly.FaceRemove(new OpParams{tags = tags});
+						// if ((faceSelections==FaceSelections.New || faceSelections==FaceSelections.NewAlt) && op == PolyHydraEnums.Ops.Skeleton)
+						// {
+						// 	// Nasty hack until I fix extrude
+						// 	// Produces better results specific for PolyMidi
+						// 	poly = poly.FaceScale(new OpParams{valueA = 0f, facesel = FaceSelections.All});
+						// }
+						// poly = poly.Shell(amountVal, false, randomize);
 						break;
 					case PolyHydraEnums.Ops.Extrude:
-						conway = conway.Loft(0, amount, faceSelections, tags, randomize);
+						poly = poly.Loft(new OpParams{tags = tags, randomize = randomize, funcA = amountFunc, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.VertexScale:
-						conway = conway.VertexScale(amount, faceSelections, randomize);
+						poly = poly.VertexScale(new OpParams{randomize = randomize, funcA = amountFunc, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.FaceSlide:
-						conway = conway.FaceSlide(amount, amount2, faceSelections, tags, randomize);
+						////poly = poly.FaceSlide(amountVal, amount2Val, faceSelections, tags, randomize);
 						break;
 					case PolyHydraEnums.Ops.FaceMerge:
-						conway = conway.FaceMerge(faceSelections);
+						////poly = poly.FaceMerge(faceSelections);
 						break;
 					case PolyHydraEnums.Ops.VertexRotate:
-						conway = conway.VertexRotate(amount, faceSelections, tags, randomize);
+						poly = poly.VertexRotate(new OpParams{tags = tags, randomize = randomize, funcA = amountFunc, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.VertexFlex:
-						conway = conway.VertexFlex(amount, faceSelections, tags, randomize);
+						poly = poly.VertexFlex(new OpParams{tags = tags, randomize = randomize, funcA = amountFunc, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.FaceOffset:
 						// TODO Faceroles ignored. Vertex Roles
 						// Split faces
-						var origRoles = conway.FaceRoles;
-						conway = conway.FaceScale(0, FaceSelections.All, tags, false);
-						conway.FaceRoles = origRoles;
-						conway = conway.Offset(amount, faceSelections, tags, randomize);
+						var origRoles = poly.FaceRoles;
+						// Split faces
+						poly = poly.FaceScale(new OpParams{tags = tags});
+						poly.FaceRoles = origRoles;
+						////poly = poly.Offset(amountVal, faceSelections, tags, randomize);
 						break;
 					case PolyHydraEnums.Ops.FaceScale:
-						conway = conway.FaceScale(amount, faceSelections, tags, randomize);
+						poly = poly.FaceScale(new OpParams{tags = tags, randomize = randomize, funcA = amountFunc, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.FaceRotate:
-						conway = conway.FaceRotate(amount, faceSelections, tags, 0, randomize);
+						poly = poly.FaceRotate(new OpParams{tags = tags, randomize = randomize, funcA = amountFunc, filterFunc = faceFilter}, 0);
 						break;
 		//					case Ops.Ribbon:
-		//						conway = conway.Ribbon(amount, false, 0.1f);
+		//						conway = conway.Ribbon(new OpParams{false, 0.1f);
 		//						break;
 		//					case Ops.FaceTranslate:
-		//						conway = conway.FaceTranslate(amount, faceSelections);
+		//						conway = conway.FaceTranslate(new OpParams{filterFunc = faceFilter});
 		//						break;
 		//					case Ops.FaceRotateX:
-		//						conway = conway.FaceRotate(amount, faceSelections, 1);
+		//						conway = conway.FaceRotate(new OpParams{1, filterFunc = faceFilter});
 		//						break;
 		//					case Ops.FaceRotateY:
-		//						conway = conway.FaceRotate(amount, faceSelections, 2);
+		//						conway = conway.FaceRotate(new OpParams{2, filterFunc = faceFilter});
 		//						break;
 					case PolyHydraEnums.Ops.FaceRemove:
-						conway = conway.FaceRemove(faceSelections, tags);
+						poly = poly.FaceRemove(new OpParams{tags = tags, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.FaceKeep:
-						conway = conway.FaceKeep(faceSelections, tags);
+						poly = poly.FaceKeep(new OpParams{tags = tags, filterFunc = faceFilter});
 						break;
 					case PolyHydraEnums.Ops.VertexRemove:
-						conway = conway.VertexRemove(faceSelections, false);
+						poly = poly.VertexRemove(new OpParams{tags = tags, filterFunc = faceFilter}, false);
 						break;
 					case PolyHydraEnums.Ops.VertexKeep:
-						conway = conway.VertexRemove(faceSelections, true);
+						poly = poly.VertexRemove(new OpParams{tags = tags, filterFunc = faceFilter}, true);
 						break;
 					case PolyHydraEnums.Ops.FillHoles:
-						conway.FillHoles();
+						poly.FillHoles();
 						break;
 					case PolyHydraEnums.Ops.Hinge:
-						conway = conway.Hinge(amount);
+						poly = poly.Hinge(amountVal);
 						break;
 					case PolyHydraEnums.Ops.AddDual:
-						conway = conway.AddDual(amount);
+						poly = poly.AddDual(amountVal);
 						break;
 					case PolyHydraEnums.Ops.AddCopyX:
-						conway = conway.AddCopy(Vector3.right, amount, faceSelections, tags);
+						////poly = poly.AddCopy(Vector3.right, amountVal, faceSelections, tags);
 						break;
 					case PolyHydraEnums.Ops.AddCopyY:
-						conway = conway.AddCopy(Vector3.up, amount, faceSelections, tags);
+						////poly = poly.AddCopy(Vector3.up, amountVal, faceSelections, tags);
 						break;
 					case PolyHydraEnums.Ops.AddCopyZ:
-						conway = conway.AddCopy(Vector3.forward, amount, faceSelections, tags);
+						////poly = poly.AddCopy(Vector3.forward, amountVal, faceSelections, tags);
 						break;
 					case PolyHydraEnums.Ops.AddMirrorX:
-						conway = conway.AddMirrored(Vector3.right, amount, faceSelections, tags);
+						////poly = poly.AddMirrored(Vector3.right, amountVal, faceSelections, tags);
 						break;
 					case PolyHydraEnums.Ops.AddMirrorY:
-						conway = conway.AddMirrored(Vector3.up, amount, faceSelections, tags);
+						////poly = poly.AddMirrored(Vector3.up, amountVal, faceSelections, tags);
 						break;
 					case PolyHydraEnums.Ops.AddMirrorZ:
-						conway = conway.AddMirrored(Vector3.forward, amount, faceSelections, tags);
+						////poly = poly.AddMirrored(Vector3.forward, amountVal, faceSelections, tags);
 						break;
 					// case PolyHydraEnums.Ops.Stash:
 					// 	stash = conway.Duplicate();
-					// 	stash = stash.FaceKeep(faceSelections);
+					// 	stash = stash.FaceKeep(faceSelections, filterFunc = faceFilter});
 					// 	break;
 					// case PolyHydraEnums.Ops.Unstash:
 					// 	if (stash == null) return conway;
 					// 	var dup = conway.Duplicate();
 					// 	var offset = Vector3.up * amount2;
-					// 	dup.Append(stash.FaceKeep(faceSelections, tags), offset, Quaternion.identity, amount);
+					// 	dup.Append(stash.FaceKeep(faceSelections, tags), offset, Quaternion.identity, 0, filterFunc = faceFilter});
 					// 	conway = dup;
 					// 	break;
 					// case PolyHydraEnums.Ops.UnstashToFaces:
 					// 	if (stash == null) return conway;
-					// 	conway = conway.AppendMany(stash, faceSelections, tags, amount, 0, amount2, true);
+					// 	conway = conway.AppendMany(stash, faceSelections, tags, 0, 0, true, filterFunc = faceFilter});
 					// 	break;
 					// case PolyHydraEnums.Ops.UnstashToVerts:
 					// 	if (stash == null) return conway;
-					// 	conway = conway.AppendMany(stash, faceSelections, tags, amount, 0, amount2, false);
+					// 	conway = conway.AppendMany(stash, faceSelections, tags, 0, 0, false, filterFunc = faceFilter});
 					// 	break;
 					case PolyHydraEnums.Ops.TagFaces:
-						conway.TagFaces(tags, faceSelections);
+						////poly.TagFaces(tags, faceSelections);
 						break;
 					case PolyHydraEnums.Ops.Layer:
-						conway = conway.Layer(4, 1f - amount, amount / 10f, faceSelections, tags);
+						////poly = poly.Layer(4, 1f - amountVal, amountVal / 10f, faceSelections, tags);
 						break;
 					case PolyHydraEnums.Ops.Canonicalize:
-						conway = conway.Canonicalize(0.1f, 0.1f);
+						poly = poly.Canonicalize(0.1f, 0.1f);
 						break;
 					case PolyHydraEnums.Ops.Spherize:
-						conway = conway.Spherize(amount, faceSelections);
+						////poly = poly.Spherize(amountVal, faceSelections);
 						break;
 					case PolyHydraEnums.Ops.Recenter:
-						conway.Recenter();
+						poly.Recenter();
 						break;
 					case PolyHydraEnums.Ops.SitLevel:
-						conway = conway.SitLevel(amount);
+						poly = poly.SitLevel(amountVal);
 						break;
 					case PolyHydraEnums.Ops.Stretch:
-						conway = conway.Stretch(amount);
+						poly = poly.Stretch(amountVal);
 						break;
 					case PolyHydraEnums.Ops.Slice:
-						conway = conway.Slice(amount, amount2);
+						poly = poly.Slice(amountVal, amount2Val);
 						break;
 					case PolyHydraEnums.Ops.Stack:
-						conway = conway.Stack(Vector3.up, amount, amount2, 0.1f, faceSelections, tags);
-						conway.Recenter();
+						////poly = poly.Stack(Vector3.up, amountVal, amount2Val, 0.1f, faceSelections, tags);
+						poly.Recenter();
 						break;
 					case PolyHydraEnums.Ops.Weld:
-						conway = conway.Weld(amount);
+						poly = poly.Weld(amountVal);
 						break;
 				}
 
 			}
 
-			conwayOutput = conway;
+			polyResult = poly;
 
 			return true;
 

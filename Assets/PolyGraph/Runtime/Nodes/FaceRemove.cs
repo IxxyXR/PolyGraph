@@ -19,7 +19,7 @@ namespace Mixture
         [Input("Source Polyhydra")]
         public ConwayPoly sourcePoly;
         [Input("Face Filter")]
-        public Func<FilterParams, bool> FaceFilter;
+        public Func<FilterParams, bool> faceFilter;
 
         [Output("Result")]
         public ConwayPoly result;
@@ -29,9 +29,8 @@ namespace Mixture
 
         protected override bool ProcessNode(CommandBuffer cmd)
         {
-            result = sourcePoly.FaceRemove(false, FaceFilter);
+            result = sourcePoly.FaceRemove(new OpParams{filterFunc = faceFilter});
             return true;
-
         }
     }
 }

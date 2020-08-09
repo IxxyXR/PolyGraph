@@ -16,7 +16,7 @@ namespace Mixture
         public override bool showDefaultInspector => true;
 
         [Input("Polyhydra")]
-        public ConwayPoly conway;
+        public ConwayPoly poly;
 
         [Output("Mesh")]
         public MixtureMesh meshOutput;
@@ -24,8 +24,8 @@ namespace Mixture
         protected override bool ProcessNode(CommandBuffer cmd)
         {
 
-            var mesh = PolyMeshBuilder.BuildMeshFromConwayPoly(conway, false);
-
+            if (poly == null) return false;
+            var mesh = PolyMeshBuilder.BuildMeshFromConwayPoly(poly, false);
             meshOutput = new MixtureMesh {mesh = mesh, localToWorld = Matrix4x4.TRS(Vector3.zero, Quaternion.identity, Vector3.one)};
 
             return true;

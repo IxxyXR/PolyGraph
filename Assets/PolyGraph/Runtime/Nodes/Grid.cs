@@ -41,7 +41,7 @@ namespace Mixture
                     poly = Grids.Grids.MakeGrid(Rows, Columns, RowScale, ColumnScale);
                     break;
                 default:
-                    poly = Grids.Grids.MakeUnitileGrid((int)GridType, (int)GridShape, Rows, Columns);
+                    poly = Grids.Grids.MakeUnitileGrid(((int)GridType) + 1, (int)GridShape, Rows, Columns);
                     break;
             }
             return true;
